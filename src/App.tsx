@@ -1,5 +1,7 @@
+import { Time } from './Time';
+
 function App() {
-  return <div>App</div>;
+  return <Time />;
 }
 
 export default App;
