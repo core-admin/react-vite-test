@@ -220,3 +220,11 @@ const menuData = [
 ];
 
 export default App;
+
+
+/**
+ * 关联资料：
+ * 
+ * https://juejin.cn/post/7384256110280802356
+ * https://www.developerway.com/posts/no-more-flickering-ui#part1
+ */
