@@ -3,8 +3,9 @@ import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 
 const links = [
-  { name: 'Demo1', href: '/' },
-  { name: 'Demo2', href: '/demo2' },
+  { name: '基础使用及验证', href: '/' },
+  { name: '结合自定义组件', href: '/demo2' },
+  { name: '整合 UI 库', href: '/demo3' },
 ];
 
 export const Route = createRootRoute({
