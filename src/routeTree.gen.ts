@@ -16,11 +16,32 @@ import { Route as rootRoute } from './routes/__root';
 
 // Create Virtual Routes
 
+const Demo6LazyImport = createFileRoute('/demo6')();
+const Demo5LazyImport = createFileRoute('/demo5')();
+const Demo4LazyImport = createFileRoute('/demo4')();
 const Demo3LazyImport = createFileRoute('/demo3')();
 const Demo2LazyImport = createFileRoute('/demo2')();
 const IndexLazyImport = createFileRoute('/')();
 
 // Create/Update Routes
+
+const Demo6LazyRoute = Demo6LazyImport.update({
+  id: '/demo6',
+  path: '/demo6',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/demo6.lazy').then(d => d.Route));
+
+const Demo5LazyRoute = Demo5LazyImport.update({
+  id: '/demo5',
+  path: '/demo5',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/demo5.lazy').then(d => d.Route));
+
+const Demo4LazyRoute = Demo4LazyImport.update({
+  id: '/demo4',
+  path: '/demo4',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/demo4.lazy').then(d => d.Route));
 
 const Demo3LazyRoute = Demo3LazyImport.update({
   id: '/demo3',
@@ -65,6 +86,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Demo3LazyImport;
       parentRoute: typeof rootRoute;
     };
+    '/demo4': {
+      id: '/demo4';
+      path: '/demo4';
+      fullPath: '/demo4';
+      preLoaderRoute: typeof Demo4LazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    '/demo5': {
+      id: '/demo5';
+      path: '/demo5';
+      fullPath: '/demo5';
+      preLoaderRoute: typeof Demo5LazyImport;
+      parentRoute: typeof rootRoute;
+    };
+    '/demo6': {
+      id: '/demo6';
+      path: '/demo6';
+      fullPath: '/demo6';
+      preLoaderRoute: typeof Demo6LazyImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
@@ -74,12 +116,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute;
   '/demo2': typeof Demo2LazyRoute;
   '/demo3': typeof Demo3LazyRoute;
+  '/demo4': typeof Demo4LazyRoute;
+  '/demo5': typeof Demo5LazyRoute;
+  '/demo6': typeof Demo6LazyRoute;
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute;
   '/demo2': typeof Demo2LazyRoute;
   '/demo3': typeof Demo3LazyRoute;
+  '/demo4': typeof Demo4LazyRoute;
+  '/demo5': typeof Demo5LazyRoute;
+  '/demo6': typeof Demo6LazyRoute;
 }
 
 export interface FileRoutesById {
@@ -87,14 +135,17 @@ export interface FileRoutesById {
   '/': typeof IndexLazyRoute;
   '/demo2': typeof Demo2LazyRoute;
   '/demo3': typeof Demo3LazyRoute;
+  '/demo4': typeof Demo4LazyRoute;
+  '/demo5': typeof Demo5LazyRoute;
+  '/demo6': typeof Demo6LazyRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/demo2' | '/demo3';
+  fullPaths: '/' | '/demo2' | '/demo3' | '/demo4' | '/demo5' | '/demo6';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/' | '/demo2' | '/demo3';
-  id: '__root__' | '/' | '/demo2' | '/demo3';
+  to: '/' | '/demo2' | '/demo3' | '/demo4' | '/demo5' | '/demo6';
+  id: '__root__' | '/' | '/demo2' | '/demo3' | '/demo4' | '/demo5' | '/demo6';
   fileRoutesById: FileRoutesById;
 }
 
@@ -102,12 +153,18 @@ export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute;
   Demo2LazyRoute: typeof Demo2LazyRoute;
   Demo3LazyRoute: typeof Demo3LazyRoute;
+  Demo4LazyRoute: typeof Demo4LazyRoute;
+  Demo5LazyRoute: typeof Demo5LazyRoute;
+  Demo6LazyRoute: typeof Demo6LazyRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   Demo2LazyRoute: Demo2LazyRoute,
   Demo3LazyRoute: Demo3LazyRoute,
+  Demo4LazyRoute: Demo4LazyRoute,
+  Demo5LazyRoute: Demo5LazyRoute,
+  Demo6LazyRoute: Demo6LazyRoute,
 };
 
 export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>();
@@ -120,7 +177,10 @@ export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileT
       "children": [
         "/",
         "/demo2",
-        "/demo3"
+        "/demo3",
+        "/demo4",
+        "/demo5",
+        "/demo6"
       ]
     },
     "/": {
@@ -131,6 +191,15 @@ export const routeTree = rootRoute._addFileChildren(rootRouteChildren)._addFileT
     },
     "/demo3": {
       "filePath": "demo3.lazy.tsx"
+    },
+    "/demo4": {
+      "filePath": "demo4.lazy.tsx"
+    },
+    "/demo5": {
+      "filePath": "demo5.lazy.tsx"
+    },
+    "/demo6": {
+      "filePath": "demo6.lazy.tsx"
     }
   }
 }

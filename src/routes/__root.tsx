@@ -6,6 +6,9 @@ const links = [
   { name: '基础使用及验证', href: '/' },
   { name: '结合自定义组件', href: '/demo2' },
   { name: '整合 UI 库', href: '/demo3' },
+  { name: '设置值/默认值', href: '/demo4' },
+  { name: 'zod 验证', href: '/demo5' },
+  { name: 'blog-demo', href: '/demo6' },
 ];
 
 export const Route = createRootRoute({

@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useId } from 'react';
 
-export const Route = createLazyFileRoute('/demo3')({
+export const Route = createLazyFileRoute('/demo4')({
   component: Index,
 });
 
@@ -36,24 +36,125 @@ interface FormState {
   password: string;
   confirmPassword: string;
   sex: string;
-  sex2: number;
   enable: boolean;
 }
+
+const sexOptions = [
+  { label: '男', value: '1' },
+  { label: '女', value: '2' },
+  { label: '未知', value: '3' },
+];
+
+interface _ResetOptions {
+  /**
+   * 是否保留字段的"脏"状态标记
+   * 只保留字段是否被修改过的标记（true/false）不保留具体的值
+   *
+   * const form = useForm({
+   *  defaultValues: { name: 'Tom' }
+   * });
+   *
+   * 用户输入 "Jerry" >>> isDirty = true
+   *
+   * form.reset({ name: '' }, { keepDirty: true });
+   * 值会被重置为 ""，但 isDirty 仍为 true
+   */
+  keepDirty: boolean;
+  /**
+   * 是否保留被修改过的字段值
+   * 保留被用户修改过的字段的实际值
+   * 未修改的字段会被重置
+   *
+   * defaultValues: { name: 'Tom', age: 20 }
+   *
+   * 用户修改 name 为 "Jerry"
+   * reset(undefined, { keepDirtyValues: true });
+   *
+   * name 保持为 "Jerry"（因为被修改过）
+   * age 重置为 20（因为未被修改）
+   *
+   * values >>> { name: 'Jerry', age: 20 }
+   *
+   * https://github.com/react-hook-form/react-hook-form/issues/8341
+   */
+  keepDirtyValues: boolean;
+  /**
+   * 是否保留错误信息
+   */
+  keepErrors: boolean;
+  /**
+   * 是否保留所有当前字段值
+   * 保留表单所有字段的当前值
+   * 不管字段是否被修改过
+   *
+   * defaultValues: { name: 'Tom', age: 20 }
+   *
+   * 用户修改 name 为 "Jerry"
+   * reset(undefined, { keepValues: true });
+   *
+   * name 保持为 "Jerry"，age 保持为 20，所有值都保持不变
+   */
+  keepValues: boolean;
+  /**
+   * 是否保留默认值
+   */
+  keepDefaultValues: boolean;
+  /**
+   * 是否保留提交状态
+   */
+  keepIsSubmitted: boolean;
+  /**
+   * 是否保留提交成功状态
+   */
+  keepIsSubmitSuccessful: boolean;
+  /**
+   * 是否保留触摸状态
+   */
+  keepTouched: boolean;
+  /**
+   * 是否保留验证进行中的状态，通常用于异步验证场景
+   */
+  keepIsValidating: boolean;
+  /**
+   * 是否保留验证结果状态，控制是否保留表单字段的验证结果状态，表示字段是否通过验证
+   */
+  keepIsValid: boolean;
+  /**
+   * 是否保留提交次数
+   */
+  keepSubmitCount: boolean;
+}
+
+/**
+ *
+ * 默认值
+ * https://github.com/react-hook-form/react-hook-form/issues/10480
+ */
 
 function Index() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors, isSubmitting },
     control,
+    /**
+     * reset 问题还是挺多的，需要实际使用时多测试
+     * 如：resetOptions.keepDirtyValues 设置的值并不能作用到reset方法的配置对象上，
+     * 使用时还需要手动设置：reset(undefined, { keepDirtyValues: true })
+     */
     reset,
     getValues,
     clearErrors,
   } = useForm<FormState>({
-    defaultValues: {
+    values: {
+      sex: '1',
       enable: true,
-      sex: '2',
-      sex2: 1,
+      email: '123@123.com',
+      password: '',
+      confirmPassword: '',
+    },
+    resetOptions: {
+      keepDirtyValues: true,
     },
   });
 
@@ -61,6 +162,9 @@ function Index() {
     await sleep(1000);
     console.log('data >>>', data);
   };
+
+  // console.log('dirtyFields.password >>>', dirtyFields.password);
+
   return (
     <Page header="Welcome Home!">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mx-auto w-2/5">
@@ -71,18 +175,6 @@ function Index() {
             name={register('sex').name}
             control={control}
             rules={{ required: '请选择性别' }}
-            /**
-             * 只在字段首次初始化时生效
-             * props.defaultValue
-             *
-             * 如果我们在 useForm 中设置默认值，useForm({ defaultValues: { sex: '2' } })
-             * 那么此处就不需要再次设置默认值，如果同时存在，则优先使用 useForm 中的默认值
-             * 推荐在 useForm 中设置默认值
-             *
-             * props.defaultValue 当 useForm 的 defaultValues 没有设置该字段时作为后备值
-             * 优先级低于 useForm 的 defaultValues
-             */
-            defaultValue="1"
             render={data => {
               /**
                * {
@@ -117,75 +209,9 @@ function Index() {
                * react-hook-form 的 register 方法会自动处理原生表单元素的默认值
                * 自定义组件（如 Select）需要明确设置默认值
                * Controller 需要手动处理自定义组件的默认值
-               *
-               * data.field.value 与 Controller.defaultValue（亦或者 useForm 的 defaultValues）之间的关系：
-               *
-               * 值传递的过程
-               * field.value 的来源顺序：
-               *  1.当前表单状态的值
-               *  2.useForm 的 defaultValues
-               *  3.Controller 的 defaultValue
-               *  4.如果都没有设置，则默认值为 undefined
-               *
-               * 实际运行时的值变化：
-               * console.log(field.value)
-               *  1.首次渲染，来自 useForm 的 defaultValues（如果没有采用 Controller 的 defaultValue，反之为undefined）
-               *  2.用户选择后: 新选择的值
-               *  3.重置表单后，采用defaultValue值
-               *  4.Select onValueChange 时，接收新值，更新field.value
                */
-
-              const sexOptions = [
-                { label: '男', value: '1' },
-                { label: '女', value: '2' },
-                { label: '未知', value: '3' },
-              ];
-
               return (
-                <Select onValueChange={onChange} value={value} name={name}>
-                  <SelectTrigger
-                    className={cn({
-                      'border-red-500 focus:border-red-200 focus:ring-offset-1 focus:ring-red-500 animate-shake focus:animate-shake':
-                        !!errors.sex,
-                    })}
-                    ref={ref}
-                  >
-                    <SelectValue placeholder="请选择性别" />
-                  </SelectTrigger>
-                  <SelectContent onCloseAutoFocus={onBlur}>
-                    {sexOptions.map(option => (
-                      <SelectItem key={option.value} value={option.value.toString()}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              );
-            }}
-          />
-          {errors.sex && <p className="text-red-500 py-1.5">{errors.sex.message}</p>}
-        </div>
-
-        <div>
-          <Controller
-            name={register('sex2').name}
-            control={control}
-            rules={{ required: '请选择性别2' }}
-            render={data => {
-              const { field } = data;
-              const { value, onChange, onBlur, ref, name } = field;
-
-              const sexOptions = [
-                { label: '男', value: 1 },
-                { label: '女', value: 2 },
-                { label: '未知', value: 3 },
-              ];
-
-              console.log('sex2 value >>>', value);
-
-              return (
-                // 自定义数据类型转换
-                <Select onValueChange={value => onChange(parseInt(value))} value={value?.toString() || ''} name={name}>
+                <Select onValueChange={onChange} value={value || ''} name={name}>
                   <SelectTrigger
                     className={cn({
                       'border-red-500 focus:border-red-200 focus:ring-offset-1 focus:ring-red-500 animate-shake focus:animate-shake':
@@ -266,7 +292,12 @@ function Index() {
           <Button type="submit" disabled={isSubmitting} className="block w-full">
             提交
           </Button>
-          <Button type="button" variant="outline" className="block w-full" onClick={() => reset()}>
+          <Button
+            type="button"
+            variant="outline"
+            className="block w-full"
+            onClick={() => reset(undefined, { keepDirtyValues: true })}
+          >
             重置表单
           </Button>
           <Button
