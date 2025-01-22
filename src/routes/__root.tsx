@@ -9,6 +9,7 @@ const links = [
   { name: '设置值/默认值', href: '/demo4' },
   { name: 'zod 验证', href: '/demo5' },
   { name: 'blog-demo', href: '/demo6' },
+  { name: 'shadcnUI Form', href: '/demo7' },
 ];
 
 export const Route = createRootRoute({

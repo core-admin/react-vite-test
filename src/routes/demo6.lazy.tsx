@@ -1,12 +1,7 @@
 import Page from '@/components/page';
 import { createLazyFileRoute } from '@tanstack/react-router';
-import { SubmitHandler, useForm, Controller, UseFormRegister, FieldError, Path, FieldPath } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { cn, sleep } from '@/lib/utils';
+import { SubmitHandler, useForm, UseFormRegister, FieldError, Path } from 'react-hook-form';
 import { z, ZodType } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 export const Route = createLazyFileRoute('/demo6')({
   component: Index,
